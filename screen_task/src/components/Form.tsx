@@ -59,14 +59,33 @@ const Form: FC = () => {
 
   const onSubmit = (data: any) => {
     if (editStatus) {
-      const result = { ...data, dateOfBirth, id: userId, image };
+      const result = {
+        ...data,
+        job: jobState,
+        place: placeState,
+        dateOfBirth,
+        id: userId,
+        image,
+      };
       dispatch(editUser(result));
+      toast.success("User Updated Successfully");
     } else {
-      const result = { ...data, dateOfBirth, image };
+      const result = {
+        ...data,
+        job: jobState,
+        place: placeState,
+        dateOfBirth,
+        image,
+      };
       dispatch(createNewUser(result));
+      toast.success("User Created Successfully");
     }
     dispatch(edit(false));
-    reset();
+    reset({ fullName: "", email: "", mobile: "", job: "", place: "" });
+    setJobState("FT");
+    setPlaceState("");
+    setDateOfBirth(new Date(Date.now()));
+    setImage("");
   };
 
   const changeHandler = (event: any) => {
