@@ -231,6 +231,7 @@ const Form: FC = () => {
               name="radio-buttons-group"
               value={jobState}
               defaultValue="FT"
+              row
             >
               <FormControlLabel
                 value="FT"
@@ -270,14 +271,16 @@ const Form: FC = () => {
               inputFormat="dd/MM/yyyy"
               value={dateOfBirth}
               onChange={handleChange}
-              renderInput={(params) => <TextField {...params} />}
+              renderInput={(params) => (
+                <TextField style={{ width: "240px" }} {...params} />
+              )}
               // {...register("date", {required:true})}
             />
           </LocalizationProvider>
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <FormControl style={{ minWidth: 240 }} error={!!errors.place}>
+          <FormControl style={{ minWidth: "240px" }} error={!!errors.place}>
             <InputLabel id="label-id">Place</InputLabel>
             <Select
               labelId="label-id"
