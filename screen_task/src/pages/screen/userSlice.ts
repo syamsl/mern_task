@@ -66,6 +66,17 @@ export const deleteUser = createAsyncThunk<IForm, { id: string }>(
   }
 );
 
+export const uploadImage = createAsyncThunk<IForm, { data: any }>(
+  "user/uploadImage",
+  async (data) => {
+    const response = await axios.post(
+      `${process.env.REACT_APP_API}/uploadimage`,
+      data
+    );
+    return response.data;
+  }
+);
+
 export const userSlice = createSlice({
   name: "user",
   initialState,
@@ -75,19 +86,19 @@ export const userSlice = createSlice({
     },
     edit: (state, action: PayloadAction<boolean>) => {
       state.editStatus = action.payload;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getUser.fulfilled,(state, action) =>{
+      .addCase(getUser.fulfilled, (state, action) => {
         state.editData = action.payload;
       })
       .addCase(getUsers.fulfilled, (state, action) => {
         state.users = action.payload;
       })
-      .addCase(createNewUser.fulfilled,(state, action)=>{
+      .addCase(createNewUser.fulfilled, (state, action) => {
         state.users = [...state.users, action.payload];
-      })
+      });
   },
 });
 

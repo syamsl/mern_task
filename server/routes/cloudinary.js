@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { upload, remove } = require("../controllers");
+const { upload, remove } = require("../controllers/cloudinary.js");
 
 router.post("/uploadimage", upload);
 router.post("/removeimage", remove);

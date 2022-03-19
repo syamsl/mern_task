@@ -13,12 +13,15 @@ import {
   FormLabel,
   Button,
   FormHelperText,
+  LinearProgress,
 } from "@mui/material";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DatePicker from "@mui/lab/DatePicker";
 import Avatar from "@mui/material/Avatar";
 import Stack from "@mui/material/Stack";
+import Resizer from "react-image-file-resizer";
+import axios from "axios";
 
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -41,6 +44,7 @@ const Form: FC = () => {
   const [jobState, setJobState] = useState<string>("FT");
   const [placeState, setPlaceState] = useState<string>("");
   const [image, setImage] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
   const { editStatus, editData } = useSelector((state: RootState) => ({
     ...state.data,
   }));
@@ -55,10 +59,10 @@ const Form: FC = () => {
 
   const onSubmit = (data: any) => {
     if (editStatus) {
-      const result = { ...data, dateOfBirth, id: userId };
+      const result = { ...data, dateOfBirth, id: userId, image };
       dispatch(editUser(result));
     } else {
-      const result = { ...data, dateOfBirth };
+      const result = { ...data, dateOfBirth, image };
       dispatch(createNewUser(result));
     }
     dispatch(edit(false));
@@ -66,7 +70,32 @@ const Form: FC = () => {
   };
 
   const changeHandler = (event: any) => {
-    console.log(event.target.files[0]);
+    const file = event.target.files[0];
+    if (file) {
+      setLoading(true);
+      Resizer.imageFileResizer(
+        file,
+        720,
+        720,
+        "JPEG",
+        100,
+        0,
+        (uri) => {
+          axios
+            .post(`${process.env.REACT_APP_API}/uploadimage`, { image: uri })
+            .then((res) => {
+              setImage(res.data.url);
+              setLoading(false);
+              toast.success("Image url created Successfully");
+            })
+            .catch((err) => {
+              setLoading(false);
+              toast.error("Image url not created");
+            });
+        },
+        "base64"
+      );
+    }
   };
 
   const handleChange = (newValue: Date | null) => {
@@ -81,11 +110,6 @@ const Form: FC = () => {
     setPlaceState(newValue);
   };
 
-  const handleProfilePicture = (e: any) => {
-    const file = e.target.files[0];
-
-  };
-
   useEffect(() => {
     if (editStatus) {
       reset(editData.user);
@@ -93,12 +117,14 @@ const Form: FC = () => {
       setJobState(editData.user.job);
       setPlaceState(editData.user.place);
       setuserId(editData.user._id);
+      setImage(editData.user.image);
     }
     dispatch(getUsers());
   }, [editStatus, editData.user]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
+      {loading ? <LinearProgress style={{ marginBottom: "20px" }} /> : null}
       <Grid container spacing={4}>
         <Grid item xs={12} sm={6} justifyContent="center">
           <TextField
@@ -122,17 +148,19 @@ const Form: FC = () => {
         </Grid>
         <Grid item xs={12} sm={6}>
           <Stack direction="row" spacing={2}>
-            <Button component="label">
+            <label>
               <Avatar
                 alt="/public/profile.jpg"
-                src="https://images.unsplash.com/photo-1594751543129-6701ad444259?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8ZGFyayUyMHByb2ZpbGV8ZW58MHx8MHx8&w=1000&q=80"
+                src={image}
                 sx={{ width: 100, height: 100 }}
-                onClick={(e) => {
-                  handleProfilePicture(e);
-                }}
               />
-              <input type="file" hidden onChange={changeHandler} />
-            </Button>
+              <input
+                type="file"
+                hidden
+                accept="images/*"
+                onChange={changeHandler}
+              />
+            </label>
           </Stack>
         </Grid>
         <Grid item xs={12} sm={6}>
