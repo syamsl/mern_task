@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from "react";
+import React, { FC, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../app/store";
 import { edit, getUser, getUsers, deleteUser } from "../pages/screen/userSlice";
@@ -15,7 +15,6 @@ import {
 
 const Filter: FC = () => {
   const dispatch = useDispatch();
-  const [editStatus, setEditStatus] = useState<boolean>(false);
   const users = useSelector((state: RootState) => state.data.users);
   
 

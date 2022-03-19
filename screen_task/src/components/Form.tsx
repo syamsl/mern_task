@@ -50,7 +50,6 @@ const Form: FC = () => {
   }));
 
   const {
-    control,
     register,
     handleSubmit,
     formState: { errors },
@@ -139,7 +138,7 @@ const Form: FC = () => {
       setImage(editData.user.image);
     }
     dispatch(getUsers());
-  }, [editStatus, editData.user]);
+  }, [editStatus, editData.user, reset, dispatch]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -272,10 +271,7 @@ const Form: FC = () => {
               value={dateOfBirth}
               onChange={handleChange}
               renderInput={(params) => (
-                <TextField
-                  style={{ maxWidth: "15rem" }}
-                  {...params}
-                />
+                <TextField style={{ maxWidth: "15rem" }} {...params} />
               )}
               // {...register("date", {required:true})}
             />
