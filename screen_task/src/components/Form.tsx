@@ -272,7 +272,10 @@ const Form: FC = () => {
               value={dateOfBirth}
               onChange={handleChange}
               renderInput={(params) => (
-                <TextField style={{ width: "240px" }} {...params} />
+                <TextField
+                  style={{ maxWidth: "15rem" }}
+                  {...params}
+                />
               )}
               // {...register("date", {required:true})}
             />
@@ -280,7 +283,7 @@ const Form: FC = () => {
         </Grid>
 
         <Grid item xs={12} sm={6}>
-          <FormControl style={{ minWidth: "240px" }} error={!!errors.place}>
+          <FormControl style={{ minWidth: "15rem" }} error={!!errors.place}>
             <InputLabel id="label-id">Place</InputLabel>
             <Select
               labelId="label-id"
