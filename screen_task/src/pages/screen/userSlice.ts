@@ -47,9 +47,9 @@ export const createNewUser = createAsyncThunk<IForm, { data: any }>(
 
 export const editUser = createAsyncThunk<IForm, { data: any; id: string }>(
   "user/editUser",
-  async (data, id) => {
+  async (data) => {
     const response = await axios.patch(
-      `${process.env.REACT_APP_API}/user/${id}`,
+      `${process.env.REACT_APP_API}/user/${data.id}`,
       data
     );
     return response.data;

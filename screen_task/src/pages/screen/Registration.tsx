@@ -2,7 +2,7 @@ import React, { FC, useState, useEffect } from "react";
 import { RootState } from "../../app/store";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { getUsers } from "./screenSlice";
+import { getUsers } from "./userSlice";
 import { Box } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import Form from "../../components/Form";

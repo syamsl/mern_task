@@ -1,7 +1,7 @@
 import React, { FC, useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../app/store";
-import { edit, getUser, getUsers, deleteUser } from "../pages/screen/screenSlice";
+import { edit, getUser, getUsers, deleteUser } from "../pages/screen/userSlice";
 import {
   Button,
   Table,

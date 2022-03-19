@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import userReducer from "../pages/screen/screenSlice";
+import userReducer from "../pages/screen/userSlice";
 
 export const store = configureStore({
   reducer: {

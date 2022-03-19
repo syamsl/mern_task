@@ -1,5 +1,5 @@
-import React, { FC, useEffect } from "react";
-import { Controller, useForm } from "react-hook-form";
+import React, { FC, useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
 import {
   InputLabel,
   TextField,
@@ -21,7 +21,12 @@ import Avatar from "@mui/material/Avatar";
 import Stack from "@mui/material/Stack";
 
 import { useDispatch, useSelector } from "react-redux";
-import { createNewUser } from "../pages/screen/screenSlice";
+import {
+  createNewUser,
+  editUser,
+  getUsers,
+  edit,
+} from "../pages/screen/userSlice";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { RootState } from "../app/store";
@@ -29,9 +34,13 @@ toast.configure();
 
 const Form: FC = () => {
   const dispatch = useDispatch();
-  const [dateOfBirth, setDateOfBirth] = React.useState<Date | null>(
+  const [dateOfBirth, setDateOfBirth] = useState<Date | null>(
     new Date(Date.now())
   );
+  const [userId, setuserId] = useState<string>("");
+  const [jobState, setJobState] = useState<string>("FT");
+  const [placeState, setPlaceState] = useState<string>("");
+  const [image, setImage] = useState<string>("");
   const { editStatus, editData } = useSelector((state: RootState) => ({
     ...state.data,
   }));
@@ -45,9 +54,14 @@ const Form: FC = () => {
   } = useForm();
 
   const onSubmit = (data: any) => {
-    const result = { ...data, dateOfBirth };
-    console.log(result);
-    dispatch(createNewUser(result));
+    if (editStatus) {
+      const result = { ...data, dateOfBirth, id: userId };
+      dispatch(editUser(result));
+    } else {
+      const result = { ...data, dateOfBirth };
+      dispatch(createNewUser(result));
+    }
+    dispatch(edit(false));
     reset();
   };
 
@@ -59,46 +73,52 @@ const Form: FC = () => {
     setDateOfBirth(newValue);
   };
 
+  const handleJobChange = (newValue: string) => {
+    setJobState(newValue);
+  };
+
+  const handlePlaceChange = (newValue: string) => {
+    setPlaceState(newValue);
+  };
+
   const handleProfilePicture = (e: any) => {
-    console.log("clicked");
+    const file = e.target.files[0];
+
   };
 
   useEffect(() => {
     if (editStatus) {
       reset(editData.user);
+      setDateOfBirth(editData.user.dateOfBirth);
+      setJobState(editData.user.job);
+      setPlaceState(editData.user.place);
+      setuserId(editData.user._id);
     }
-  });
+    dispatch(getUsers());
+  }, [editStatus, editData.user]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={4}>
         <Grid item xs={12} sm={6} justifyContent="center">
-          {/* <Controller
-            render={({
-              field: { name, value, onChange },
-            }) => ( */}
-              <TextField
-                error={!!errors.fullName}
-                helperText={
-                  errors.fullName && <span>{errors.fullName.message}</span>
-                }
-                label="Full Name"
-                type="text"
-                placeholder="Full name"
-                {...register("fullName", {
-                  required: "This is required!",
-                  minLength: { value: 2, message: "Min 2 characters" },
-                  maxLength: {
-                    value: 10,
-                    message: "Must be 10 characters or less",
-                  },
-                })}
-              />
-            {/* )}
-            name="TextField"
-            control={control}
-            defaultValue=""
-          /> */}
+          <TextField
+            error={!!errors.fullName}
+            helperText={
+              errors.fullName && <span>{errors.fullName.message}</span>
+            }
+            label="Full Name"
+            type="text"
+            placeholder="Full name"
+            InputLabelProps={{ shrink: true }}
+            {...register("fullName", {
+              required: "This is required!",
+              minLength: { value: 2, message: "Min 2 characters" },
+              maxLength: {
+                value: 10,
+                message: "Must be 10 characters or less",
+              },
+            })}
+          />
         </Grid>
         <Grid item xs={12} sm={6}>
           <Stack direction="row" spacing={2}>
@@ -122,6 +142,7 @@ const Form: FC = () => {
             label="Mobile"
             type="number"
             placeholder="Mobile number"
+            InputLabelProps={{ shrink: true }}
             {...register("mobile", {
               required: "Mobile number is required",
               minLength: {
@@ -147,6 +168,7 @@ const Form: FC = () => {
             label="Email"
             type="text"
             placeholder="Email"
+            InputLabelProps={{ shrink: true }}
             {...register("email", {
               required: "Email is required",
               pattern: { value: /^\S+@\S+$/i, message: "Invalid email" },
@@ -160,25 +182,34 @@ const Form: FC = () => {
             <RadioGroup
               aria-labelledby="demo-radio-buttons-group-label"
               name="radio-buttons-group"
+              value={jobState}
               defaultValue="FT"
             >
               <FormControlLabel
                 value="FT"
                 {...register("job", { required: true })}
                 control={<Radio />}
-                defaultChecked={true}
+                onChange={() => {
+                  handleJobChange("FT");
+                }}
                 label="FT"
               />
               <FormControlLabel
                 value="PT"
                 {...register("job", { required: true })}
                 control={<Radio />}
+                onChange={() => {
+                  handleJobChange("PT");
+                }}
                 label="PT"
               />
               <FormControlLabel
                 value="Consultant"
                 {...register("job", { required: true })}
                 control={<Radio />}
+                onChange={() => {
+                  handleJobChange("Consultant");
+                }}
                 label="Consultant"
               />
             </RadioGroup>
@@ -205,13 +236,33 @@ const Form: FC = () => {
               labelId="label-id"
               id="select-id"
               label="Place"
-              defaultValue=""
+              value={placeState}
               {...register("place", { required: true })}
             >
-              <MenuItem value="Chennai">Chennai</MenuItem>
-              <MenuItem value="Trivandrum">Trivandrum</MenuItem>
-              <MenuItem value="Kochi">Kochi</MenuItem>
-              <MenuItem value="Bangalore">Bangalore</MenuItem>
+              <MenuItem
+                value="Chennai"
+                onClick={() => handlePlaceChange("Chennai")}
+              >
+                Chennai
+              </MenuItem>
+              <MenuItem
+                value="Trivandrum"
+                onClick={() => handlePlaceChange("Trivandrum")}
+              >
+                Trivandrum
+              </MenuItem>
+              <MenuItem
+                value="Kochi"
+                onClick={() => handlePlaceChange("Kochi")}
+              >
+                Kochi
+              </MenuItem>
+              <MenuItem
+                value="Bangalore"
+                onClick={() => handlePlaceChange("Bangalore")}
+              >
+                Bangalore
+              </MenuItem>
             </Select>
             <FormHelperText>
               {errors.place && <span>Place is required.</span>}
